@@ -74,3 +74,63 @@ function getNewJQInput(name,type,value)
     return $("<input/>",{"type":type,"name":name,"value":value});
 }
 
+function checkEconselResultURL() {
+    var url = location.href;
+    var matches = url.match(/econsel=(ok|ko|ww)/);
+    if (matches != null && matches.length == 2) {
+        var result = matches[1];
+        if (result == 'ko') {
+            matches = url.match(/error=(.{1,})/);
+            if (matches != null && matches.length > 1) {
+                var error = matches[1];
+                $('#orderError').append("<div>" + unescape(error) + "</div>");
+            }
+
+            $('#orderError').dialog({
+                modal: true,
+                resizable: false,
+                draggable: false,
+                dialogClass: "ui-message-dialog",
+                close: function(event, ui) {
+                    location.href = location.href.split("?")[0];
+                }
+
+            })
+        } else if (result == 'ok') {
+            emptyCart();
+            $("#orderSuccess").dialog(
+                    {
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        dialogClass: "ui-message-dialog",
+                        close: function(event, ui) {
+                            location.href = location.href.split("?")[0];
+                        }
+
+                    }
+            );
+        }else  {
+            emptyCart();
+            
+            $('#orderSuccess').append("<br/><div style='font-weight:bold'>La tua transazione &egrave; stata accettata ed &egrave; in stato 'provvisorio'.<br/> Ti ricontatteremo appena possibile.</div>");
+            $("#orderSuccess").dialog(
+                    {
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        dialogClass: "ui-message-dialog",
+                        close: function(event, ui) {
+                            location.href = location.href.split("?")[0];
+                        }
+
+                    }
+            );
+        }
+    }
+}
+
+
+$(document).ready(function(){
+    checkEconselResultURL();
+});
