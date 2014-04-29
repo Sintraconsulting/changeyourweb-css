@@ -7,7 +7,6 @@
 var finanziamentoOnline="Finanziamento online";
 var econselURL="https://reserved.e-consel.it/DOL/faces/frmECProntoTuo.jsp";
 var oldDoPayment = doPayment;
-var oldOnSuccessLoadStore1MS=onSuccessLoadStore1MS;
 function onSuccessLoadStore1MS(){
     translations['error.ecommerce.product_child_not_selected'] = "Scegli la configurazione di scarico";
     var $productChildSelect = $(".product-child-select");
