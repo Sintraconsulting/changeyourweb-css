@@ -9,7 +9,12 @@ var econselURL="https://reserved.e-consel.it/DOL/faces/frmECProntoTuo.jsp";
 var oldDoPayment = doPayment;
 var oldOnSuccessLoadStore1MS=onSuccessLoadStore1MS;
 function onSuccessLoadStore1MS(){
-    oldOnSuccessLoadStore1MS();
+    translations['error.ecommerce.product_child_not_selected'] = "Scegli la configurazione di scarico";
+    var $productChildSelect = $(".product-child-select");
+    if ($productChildSelect.size() > 0){
+        $productChildSelect.prepend("<option value=''>Configurazione di scarico</option>").val("").val("").change();
+    }
+    
     //aggiungi elemento alla lista
     $("#fe_payment_method").append($("<option/>",{"value":finanziamentoOnline}).text(finanziamentoOnline));
 }
