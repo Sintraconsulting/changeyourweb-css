@@ -7,8 +7,9 @@
 var finanziamentoOnline="Finanziamento online";
 var econselURL="https://reserved.e-consel.it/DOL/faces/frmECProntoTuo.jsp";
 var oldDoPayment = doPayment;
-
+var oldOnSuccessLoadStore1MS=onSuccessLoadStore1MS;
 function onSuccessLoadStore1MS(){
+    oldOnSuccessLoadStore1MS();
     //aggiungi elemento alla lista
     $("#fe_payment_method").append($("<option/>",{"value":finanziamentoOnline}).text(finanziamentoOnline));
 }
