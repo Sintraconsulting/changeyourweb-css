@@ -1,48 +1,40 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 var finanziamentoOnline = "Finanziamento online";
 var econselURL = "https://reserved.e-consel.it/DOL/faces/frmECProntoTuo.jsp";
-var oldDoPayment = doPayment;
-function onSuccessLoadStore1MS() {
 
-  if (typeof translations === 'object') {
-    translations['error.ecommerce.product_child_not_selected'] = "Scegli la configurazione di scarico";
-  } else {
-    require(['oms/translations'], function (translations) {
-      translations['error.ecommerce.product_child_not_selected'] = "Scegli la configurazione di scarico";
-    });
-  }
+(function() {
+    "use strict";
 
-  if (typeof omsOnInit === 'function') {
-    omsOnInit(function () {
-      require(['jquery'], function ($) {
-        doWork($);
-      });
-    });
-  } else {
-    require(['jquery'], function ($) {
-      doWork($);
-    });
-  }
-
-
-  function doWork($) {
-    var $productChildSelect = $(".product-child-select");
-    if ($productChildSelect.size() > 0) {
-      $productChildSelect.prepend("<option value=''>Configurazione di scarico</option>").val("").val("").change();
+    if (typeof omsOnInit === 'function') {
+        omsOnInit(doWork);
     }
-    
-    //aggiungi elemento alla lista
-    $("#fe_payment_method").append($("<option/>", { "value": finanziamentoOnline }).text(finanziamentoOnline));
-  }
-}
+    else {
+        doWork();
+    }
+
+    function doWork() {
+        require(['jquery', 'domReady!'], function($) {
+            if (typeof translations === 'object') {
+                translations['error.ecommerce.product_child_not_selected'] = "Scegli la configurazione di scarico";
+            } else {
+                require(['oms/translations'], function(translations) {
+                    translations['error.ecommerce.product_child_not_selected'] = "Scegli la configurazione di scarico";
+                });
+            }
+            var $productChildSelect = $(".product-child-select");
+            if ($productChildSelect.size() > 0) {
+                $productChildSelect.prepend("<option value=''>Configurazione di scarico</option>").val("").val("").change();
+            }
+
+            //aggiungi elemento alla lista
+            $("#fe_payment_method").append($("<option/>", { "value": finanziamentoOnline }).text(finanziamentoOnline));
+            checkEconselResultURL($);
+        });
+    }
+})();
 
 function doCarmetPayment(form) {
   var $form = $(form);
+  var cartForm=$('#cartForm');
   if ($("#fe_payment_method option:selected").val() === finanziamentoOnline) {
 
     var cartTotal = simpleCart.finalTotal;
@@ -92,8 +84,19 @@ function doCarmetPayment(form) {
     return oldDoPayment(form);
   }
 }
-doPayment = doCarmetPayment;
-
+if (typeof isMigrateRequireJS !=='boolean'){
+    window.oldDoPayment = doPayment;
+    doPayment = doCarmetPayment;    
+}
+else{
+    require(['oms/ecommerce/checkout'],function(checkout){
+       window.oldDoPaymentRef=checkout.doPayment;
+       window.oldDoPayment=function(form){
+           oldDoPaymentRef.call(checkout,form);
+       };
+       checkout.doPayment= doCarmetPayment;
+    });
+}
 
 function getNewJQInput(name, type, value) {
   return $("<input/>", { "type": type, "name": name, "value": value });
@@ -120,7 +123,7 @@ function checkEconselResultURL() {
           location.href = location.href.split("?")[0];
         }
 
-      })
+      });
     } else if (result == 'ok') {
       emptyCart();
       $("#orderSuccess").dialog(
@@ -154,8 +157,3 @@ function checkEconselResultURL() {
     }
   }
 }
-
-
-$(document).ready(function () {
-  checkEconselResultURL();
-});
